@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BatchApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250530115524_aa")]
-    partial class aa
+    [Migration("20250602120752_users")]
+    partial class users
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,6 +43,47 @@ namespace BatchApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Batches");
+                });
+
+            modelBuilder.Entity("BatchApi.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Password = "user1",
+                            UserName = "user1"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Password = "user2",
+                            UserName = "user2"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Password = "user3",
+                            UserName = "user3"
+                        });
                 });
 #pragma warning restore 612, 618
         }
