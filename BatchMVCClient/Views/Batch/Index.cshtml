@@ -2,10 +2,17 @@
 
 @{
     ViewData["Title"] = "Index";
+ 
 }
+@* 
+@{
+    if (@TempData["Message"] != null)
+{
 
-<h1>Index</h1>
-
+        <h1> @TempData["Message"] </h1>
+    
+}
+} *@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
@@ -43,5 +50,8 @@
             </td>
         </tr>
 }
+}
+ 
+
     </tbody>
 </table>

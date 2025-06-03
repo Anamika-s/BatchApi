@@ -28,6 +28,10 @@ namespace MVCClient.Controllers
         {
             List<Batch> batches = null;
             client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Authorization =
+new AuthenticationHeaderValue("Bearer",
+HttpContext.Session.GetString("token"));
+
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
             HttpResponseMessage responseMessage = await client.GetAsync(url);
             if (responseMessage.IsSuccessStatusCode)
@@ -53,6 +57,10 @@ namespace MVCClient.Controllers
             Batch batch = null;
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Authorization =
+new AuthenticationHeaderValue("Bearer",
+HttpContext.Session.GetString("token"));
+
             HttpResponseMessage responseMessage = await client.GetAsync(url+"/"+id);
             if (responseMessage.IsSuccessStatusCode)
             {
@@ -89,8 +97,10 @@ namespace MVCClient.Controllers
                 client.BaseAddress = new Uri(url);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                Batch.StartDate = DateTime.Now;
+                client.DefaultRequestHeaders.Authorization =
+new AuthenticationHeaderValue("Bearer",
+HttpContext.Session.GetString("token"));
+                Batch.Id = 0;
                 HttpResponseMessage responseMessage = await client.PostAsJsonAsync(url, Batch);
                 if (responseMessage.IsSuccessStatusCode)
                 {
@@ -115,6 +125,10 @@ namespace MVCClient.Controllers
             Batch batch = null;
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Authorization =
+new AuthenticationHeaderValue("Bearer",
+HttpContext.Session.GetString("token"));
+
             HttpResponseMessage responseMessage = await client.GetAsync(url + "/" + id);
             if (responseMessage.IsSuccessStatusCode)
             {
@@ -131,7 +145,6 @@ namespace MVCClient.Controllers
 
 
             return View(batch);
-
         }
 
         // POST: StudentController/Edit/5
@@ -146,7 +159,9 @@ namespace MVCClient.Controllers
                 client.BaseAddress = new Uri(url);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+                client.DefaultRequestHeaders.Authorization =
+new AuthenticationHeaderValue("Bearer",
+HttpContext.Session.GetString("token"));
 
                 HttpResponseMessage responseMessage = await client.PutAsJsonAsync(url+"/"+id, Batch);
                 if (responseMessage.IsSuccessStatusCode)
@@ -167,9 +182,31 @@ namespace MVCClient.Controllers
         }
 
         // GET: StudentController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task <ActionResult> Delete(int id)
         {
-            return View();
+            Batch batch = null;
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Authorization =
+new AuthenticationHeaderValue("Bearer",
+HttpContext.Session.GetString("token"));
+
+            HttpResponseMessage responseMessage = await client.GetAsync(url + "/" + id);
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                var jsonString = responseMessage.Content.ReadAsStringAsync();
+                jsonString.Wait();
+
+                batch = JsonConvert.DeserializeObject<Batch>(jsonString.Result);
+            }
+            else
+            {
+                ViewBag.msg = responseMessage.ReasonPhrase;
+                return View();
+            }
+
+
+            return View(batch);
         }
 
         // POST: StudentController/Delete/5

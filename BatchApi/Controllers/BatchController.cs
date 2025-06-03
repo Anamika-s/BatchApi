@@ -8,19 +8,20 @@ using RepositoryPatternDemo.Repo;
 namespace BatchApi.Controllers
 
 {
-    [Authorize]
+
     [Route("api/[controller]")]
     [ApiController]
     public class BatchController : ControllerBase
     {
         private BatchRepo _repo;
-        public BatchController (BatchRepo repo)
+        public BatchController(BatchRepo repo)
 
         {
             _repo = repo;
         }
         // GET: api/<BatchController>
         [HttpGet]
+        [Authorize]
         public IActionResult Get()
         {
             if (_repo.GetBatches().Count == 0)
@@ -32,6 +33,7 @@ namespace BatchApi.Controllers
 
         // GET api/<BatchController>/5
         [HttpGet("{id}")]
+        [Authorize]
         public IActionResult Get(int id)
         {
             if (_repo.GetBatch(id) == null)
@@ -42,6 +44,7 @@ namespace BatchApi.Controllers
 
         // POST api/<BatchController>
         [HttpPost]
+        [Authorize(Roles="Admin")]
         public IActionResult Post(Batch batch)
         {
             _repo.AddBatch(batch);
@@ -50,6 +53,7 @@ namespace BatchApi.Controllers
 
         // PUT api/<BatchController>/5
         [HttpPut("{id}")]
+        [Authorize(Roles ="Admin")]
         public IActionResult Put(int id, Batch batch)
         {
             _repo.EditBatch(id, batch);
@@ -58,6 +62,7 @@ namespace BatchApi.Controllers
 
         // DELETE api/<BatchController>/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Delete(int id)
         {
              _repo.DeleteBatch(id);

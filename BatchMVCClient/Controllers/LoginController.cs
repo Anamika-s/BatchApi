@@ -8,7 +8,7 @@ namespace BatchMVCClient.Controllers
 {
     public class LoginController : Controller
     {
-        string url = " https://localhost:7218/api/login";
+        string url = "https://localhost:7218/api/login";
         HttpClient client = null;
         public LoginController()
         {
@@ -22,30 +22,27 @@ namespace BatchMVCClient.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(User user)
+        public async Task<ActionResult> Login(User user)
         {
             var token = string.Empty;
-            StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
-            
-            client.BaseAddress = new Uri(url);
-            var contentType = new MediaTypeWithQualityHeaderValue
-("application/json");
-            client.DefaultRequestHeaders.Accept.Add(contentType);
-            var Response = client.PostAsync(url, content);
-            var result = Response.Result;
+            //StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
 
-            if (result.IsSuccessStatusCode)
+            //client.BaseAddress = new Uri(url);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            user.Id = 0;
+            HttpResponseMessage responseMessage = await client.PostAsJsonAsync(url, user);
+            if (responseMessage.IsSuccessStatusCode)
             {
-                var stringJWT = result.Content.ReadAsStringAsync().Result;
+                var stringJWT = responseMessage.Content.ReadAsStringAsync().Result;
                 JwtToken jwt = JsonConvert.DeserializeObject
   <JwtToken>(stringJWT);
-                //HttpContext.Session.SetString("token", jwt.Token);
+                HttpContext.Session.SetString("token", jwt.Token);
 
-                ViewBag.Message = "User logged in successfully!";
-                //HttpContext.Session["token"] = token.ToString();
-                //return View();
+                TempData["Message"] = "User logged in successfully!";
+                
 
-                return RedirectToAction("Index", "Student");
+                return RedirectToAction("Index", "Batch");
 
             }
             else
