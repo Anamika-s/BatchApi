@@ -3,6 +3,7 @@ using BatchMVCClient.Models;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
+using BatchMVCClient.ViewModels;
 
 namespace BatchMVCClient.Controllers
 {
@@ -22,7 +23,7 @@ namespace BatchMVCClient.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Login(User user)
+        public async Task<ActionResult> Login(LoginViewModel user)
         {
             var token = string.Empty;
             //StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
@@ -30,7 +31,7 @@ namespace BatchMVCClient.Controllers
             //client.BaseAddress = new Uri(url);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            user.Id = 0;
+            
             HttpResponseMessage responseMessage = await client.PostAsJsonAsync(url, user);
             if (responseMessage.IsSuccessStatusCode)
             {
@@ -38,7 +39,7 @@ namespace BatchMVCClient.Controllers
                 JwtToken jwt = JsonConvert.DeserializeObject
   <JwtToken>(stringJWT);
                 HttpContext.Session.SetString("token", jwt.Token);
-
+                
                 TempData["Message"] = "User logged in successfully!";
                 
 

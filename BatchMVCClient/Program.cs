@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace BatchMVCClient
 {
     public class Program
@@ -7,6 +9,7 @@ namespace BatchMVCClient
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+         
             builder.Services.AddControllersWithViews();
             builder.Services.AddSession(options =>
             {

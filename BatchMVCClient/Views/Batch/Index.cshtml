@@ -1,10 +1,12 @@
 ﻿@model IEnumerable<BatchMVCClient.Models.Batch>
-
+@* var user = BatchMVCClient.Models.User; *@
 @{
     ViewData["Title"] = "Index";
  
 }
 @* 
+
+
 @{
     if (@TempData["Message"] != null)
 {
@@ -13,9 +15,7 @@
     
 }
 } *@
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+        @Html.ActionLink("Create", "Create")
 <table class="table">
     <thead>
         <tr>
@@ -50,7 +50,7 @@
             </td>
         </tr>
 }
-}
+
  
 
     </tbody>

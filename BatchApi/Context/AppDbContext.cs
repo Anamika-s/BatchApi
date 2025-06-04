@@ -47,13 +47,19 @@ namespace BatchApi.Context
       Id=1,
         UserName = "user1",
         Password = "user1",
-        RoleId=1
+        FirstName = "user1",
+        LastName = "user1",
+        Address = "dl",
+        RoleId =1
     },
     new User
     {
        Id=2,
         UserName = "user2",
         Password = "user2",
+        FirstName="user2",
+        LastName="user2",
+        Address="dl",
         RoleId=2
     },
     new User
@@ -61,7 +67,10 @@ namespace BatchApi.Context
         Id=3,
           UserName = "user3",
         Password = "user3",
-        RoleId=3
+        RoleId=3,
+        FirstName = "user3",
+        LastName = "user3",
+        Address = "dl"
     }
     );
 

@@ -9,6 +9,8 @@ using System.Security.Claims;
 using BatchApi.Migrations;
 using Newtonsoft.Json;
 using System.Data;
+using Microsoft.AspNetCore.Identity;
+using BatchApi.ViewModels;
 
 namespace BatchApi.Controllers
 {
@@ -23,15 +25,35 @@ namespace BatchApi.Controllers
             _context = context;
             _configuration = configuration;
         }
+        // [HttpPost]
+        //public IActionResult Login(User user)
+        // {
+        //     IActionResult response = Unauthorized();
+        //     var obj = _context.Users.FirstOrDefault(x => x.UserName ==
+        // user.UserName && x.Password == user.Password);
+        //     if (obj!=null)
+        //     {
+        //         //var tokenString = GenerateJSONWebToken(user);
+        //         var tokenString = GenerateJSONWebToken(obj);
+
+        //         response = Ok(new { token = tokenString });
+        //     }
+        //     return response;
+
+
+        // }
+
         [HttpPost]
-       public IActionResult Login(User user)
+        public IActionResult Login(LoginViewModel user)
         {
             IActionResult response = Unauthorized();
             var obj = _context.Users.FirstOrDefault(x => x.UserName ==
         user.UserName && x.Password == user.Password);
-            if (obj!=null)
+            if (obj != null)
             {
-                var tokenString = GenerateJSONWebToken(user);
+                //var tokenString = GenerateJSONWebToken(user);
+                var tokenString = GenerateJSONWebToken(obj);
+
                 response = Ok(new { token = tokenString });
             }
             return response;
@@ -56,57 +78,29 @@ namespace BatchApi.Controllers
 
         private string GenerateJSONWebToken(User user)
         {
-
-            //var roleName = GetRoleName(user.RoleId);
-            //var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            //var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            //// THIS IS FOR CLAIMS
-
-            //var claims = new List<Claim>
-            //{
-            //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),  // Fixed issue
-            //    new Claim(JwtRegisteredClaimNames.Sid, user.Id.ToString()),
-            //    new Claim(JwtRegisteredClaimNames.Name, $"{user.UserName}"),
-            //    //new Claim(ClaimTypes.Email, user.Email),
-            //    new Claim(ClaimTypes.Role, roleName),
-            //    new Claim("DateOnly", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"))
-            //};
-
-            //foreach (var role in _context.Roles)
-            //{
-            //    claims.Add(new Claim(ClaimTypes.Role, role.RoleName));
-            //}
-            //var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
-
-            //  _configuration["Jwt:Audience"],
-
-            //  expires: DateTime.Now.AddMinutes(120),
-            //  signingCredentials: credentials);
-
-            //return new JwtSecurityTokenHandler().WriteToken(token);
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var roleName = GetRoleName(user.RoleId);
-            var claims = new[]
-           {
-                new Claim("userId", user.UserName),
-                new Claim("role", GetRoleName(user.RoleId))
-            };
+            string RoleName = GetRoleName(user.RoleId);
+            IEnumerable<Claim> claims = new Claim[] {
+                    new Claim(JwtRegisteredClaimNames.Jti, new Guid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Sid, user.Id.ToString()),
+                    //new Claim("Id", user.Email),
+                        new Claim(ClaimTypes.Name, user.FirstName.ToString() + " " + user.LastName),
+                        //new Claim(ClaimTypes.Email, user.Email),
+                        //new Claim(ClaimTypes.Role, user.RoleId.ToString()),
+                        new Claim(ClaimTypes.Role, RoleName),
+                        new Claim(type:"Date", DateTime.Now.ToString()),
+                        new Claim(ClaimTypes.Expiration, DateTime.UtcNow.AddDays(1).ToString("MMM ddd dd yyyy HH:mm:ss tt"))
+                };
 
-            //var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("this_is_my_secret_key"));
-            //var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
+             _configuration["Jwt:Audience"],
+             claims,
+             expires: DateTime.Now.AddMinutes(120),
+             signingCredentials: credentials);
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
-                signingCredentials: credentials
-            );
 
-           
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
@@ -114,7 +108,7 @@ namespace BatchApi.Controllers
         {
             string roleName = (from x in _context.Roles
                                where x.RoleId == roleId
-                               select x.RoleName).ToString();
+                               select x.RoleName).FirstOrDefault();
             return roleName;
                 }
     }
